@@ -6,21 +6,14 @@
  * Return: 0 if no numbers in string, converted number otherwise
  *       -1 on error
  */
-
 int _erratoi(char *s)
 {
+	int i = 0;
 	unsigned long int result = 0;
-	int sign = 1;
 
 	if (*s == '+')
-		s++;
-	else if (*s == '-')
-	{
-		sign = -1;
-		s++;
-	}
-
-	for (int i = 0; s[i] != '\0'; i++)
+		s++;  /* TODO: why does this make main return 255? */
+	for (i = 0;  s[i] != '\0'; i++)
 	{
 		if (s[i] >= '0' && s[i] <= '9')
 		{
@@ -32,7 +25,7 @@ int _erratoi(char *s)
 		else
 			return (-1);
 	}
-	return (result * sign);
+	return (result);
 }
 
 /**
@@ -42,19 +35,15 @@ int _erratoi(char *s)
  * Return: 0 if no numbers in string, converted number otherwise
  *        -1 on error
  */
-
 void print_error(info_t *info, char *estr)
 {
-	int fd = STDERR_FILENO;
-
-	write(fd, info->fname, strlen(info->fname));
-	write(fd, ": ", 2);
-	print_d(info->line_count, fd);
-	write(fd, ": ", 2);
-	write(fd, info->argv[0], strlen(info->argv[0]));
-	write(fd, ": ", 2);
-	write(fd, estr, strlen(estr));
-	write(fd, "\n", 1);
+	_eputs(info->fname);
+	_eputs(": ");
+	print_d(info->line_count, STDERR_FILENO);
+	_eputs(": ");
+	_eputs(info->argv[0]);
+	_eputs(": ");
+	_eputs(estr);
 }
 
 /**
@@ -66,24 +55,32 @@ void print_error(info_t *info, char *estr)
  */
 int print_d(int input, int fd)
 {
-	int count = 0;
-	unsigned int n = input;
+	int (*__putchar)(char) = _putchar;
+	int i, count = 0;
+	unsigned int _abs_, current;
 
+	if (fd == STDERR_FILENO)
+		__putchar = _eputchar;
 	if (input < 0)
 	{
-		write(fd, "-", 1);
+		_abs_ = -input;
+		__putchar('-');
 		count++;
-		n = -input;
 	}
-
-	while (n > 0)
+	else
+		_abs_ = input;
+	current = _abs_;
+	for (i = 1000000000; i > 1; i /= 10)
 	{
-		char digit = '0' + (n % 10);
-
-		write(fd, &digit, 1);
-		count++;
-		n /= 10;
+		if (_abs_ / i)
+		{
+			__putchar('0' + current / i);
+			count++;
+		}
+		current %= i;
 	}
+	__putchar('0' + current);
+	count++;
 
 	return (count);
 }
@@ -96,7 +93,6 @@ int print_d(int input, int fd)
  *
  * Return: string
  */
-
 char *convert_number(long int num, int base, int flags)
 {
 	static char *array;
@@ -131,7 +127,6 @@ char *convert_number(long int num, int base, int flags)
  *
  * Return: Always 0;
  */
-
 void remove_comments(char *buf)
 {
 	int i;

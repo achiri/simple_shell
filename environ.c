@@ -1,8 +1,8 @@
 #include "shell.h"
 
 /**
- * _myenv - prints the current environment
- * @info: Structure containing potential arguments. Used to maintain
+ * _myenv - print the current environment
+ * @info: Structure containing potential arguments Used to maintain
  *          constant function prototype.
  * Return: Always 0
  */
@@ -48,27 +48,9 @@ int _mysetenv(info_t *info)
 		_eputs("Incorrect number of arguements\n");
 		return (1);
 	}
-
-	char *new_env_var = malloc(sizeof(char) * (_strlen(info->argv[1]) + _strlen(info->argv[2]) + 2));
-
-	if (!new_env_var)
-		return (1);
-
-	_strcpy(new_env_var, info->argv[1]);
-	_strcat(new_env_var, "=");
-	_strcat(new_env_var, info->argv[2]);
-
-	list_t *new_node = malloc(sizeof(list_t));
-
-	if (!new_node)
-		return (1);
-
-	new_node->str = new_env_var;
-	new_node->next = NULL;
-
-	add_node_end(&(info->env), new_node->str, 0);
-
-	return (0);
+	if (_setenv(info, info->argv[1], info->argv[2]))
+		return (0);
+	return (1);
 }
 
 /**
@@ -86,31 +68,8 @@ int _myunsetenv(info_t *info)
 		_eputs("Too few arguements.\n");
 		return (1);
 	}
-
 	for (i = 1; i <= info->argc; i++)
-	{
-		list_t *node = info->env;
-		list_t *prev = NULL;
-
-		while (node)
-		{
-			if (_strcmp(node->str, info->argv[i]) == 0)
-			{
-				if (prev)
-					prev->next = node->next;
-				else
-					info->env = node->next;
-
-				free(node->str);
-				free(node);
-
-				break;
-			}
-
-			prev = node;
-			node = node->next;
-		}
-	}
+		_unsetenv(info, info->argv[i]);
 
 	return (0);
 }
@@ -131,4 +90,3 @@ int populate_env_list(info_t *info)
 	info->env = node;
 	return (0);
 }
-
