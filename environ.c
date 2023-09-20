@@ -127,16 +127,8 @@ int populate_env_list(info_t *info)
 	size_t i;
 
 	for (i = 0; environ[i]; i++)
-	{
-		list_t *new_node = malloc(sizeof(list_t));
-
-		if (!new_node)
-			return (1);
-
-		new_node->str = environ[i];
-		new_node->next = NULL;
-
-		add_node_end(&node, new_node->str, 0);
-	}
-
+		add_node_end(&node, environ[i], 0);
 	info->env = node;
+	return (0);
+}
+
